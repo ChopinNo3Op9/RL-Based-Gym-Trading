@@ -134,7 +134,7 @@ class TradingEnv(gym.Env):
 
         def _plot_position(position, tick):
             color = None
-            if position == Positions.Short:
+            if position == Positions.Short: 
                 color = 'red'
             elif position == Positions.Long:
                 color = 'green'
