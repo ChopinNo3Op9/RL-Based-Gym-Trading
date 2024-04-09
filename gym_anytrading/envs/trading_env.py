@@ -76,38 +76,67 @@ class TradingEnv(gym.Env):
 
         return observation, info
 
+    # def step(self, action):
+    #     self._truncated = False
+    #     self._current_tick += 1
+
+    #     if self._current_tick == self._end_tick:
+    #         self._truncated = True
+
+    #     step_reward = self._calculate_reward(action)
+    #     self._total_reward += step_reward
+
+    #     self._update_profit(action)
+
+    #     trade = False
+    #     if (
+    #         (action == Actions.Buy.value and self._position == Positions.Short) or
+    #         (action == Actions.Sell.value and self._position == Positions.Long)
+    #     ):
+    #         trade = True
+
+    #     if trade:
+    #         self._position = self._position.opposite()
+    #         self._last_trade_tick = self._current_tick
+
+    #     self._position_history.append(self._position)
+    #     observation = self._get_observation()
+    #     info = self._get_info()
+    #     self._update_history(info)
+
+    #     if self.render_mode == 'human':
+    #         self._render_frame()
+
+    #     return observation, step_reward, False, self._truncated, info
+
     def step(self, action):
-        self._truncated = False
+        self._truncated = self._current_tick + 1 >= self._end_tick
         self._current_tick += 1
 
-        if self._current_tick == self._end_tick:
-            self._truncated = True
-
-        step_reward = self._calculate_reward(action)
+        previous_position = self._position
+        step_reward, trade_executed = self._calculate_reward(action)
         self._total_reward += step_reward
 
-        self._update_profit(action)
-
-        trade = False
-        if (
-            (action == Actions.Buy.value and self._position == Positions.Short) or
-            (action == Actions.Sell.value and self._position == Positions.Long)
-        ):
-            trade = True
-
-        if trade:
+        if trade_executed:
             self._position = self._position.opposite()
             self._last_trade_tick = self._current_tick
+            self._update_profit(action, previous_position)
+        else:
+            # Handle cases where trade is not executed - could be due to lack of liquidity, slippage, etc.
+            pass
 
         self._position_history.append(self._position)
         observation = self._get_observation()
         info = self._get_info()
-        self._update_history(info)
 
         if self.render_mode == 'human':
             self._render_frame()
 
-        return observation, step_reward, False, self._truncated, info
+        done = self._truncated  # Consider other terminal conditions
+        info.update({'trade_executed': trade_executed, 'previous_position': previous_position})
+
+        return observation, step_reward, done, info
+
 
     def _get_info(self):
         return dict(

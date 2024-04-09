@@ -108,7 +108,7 @@ class StocksEnv(TradingEnv):
 
         # Adjust for Sharpe Ratio over a rolling window of returns
         window_size = 100
-        if len(self.history['total_profit']) > window_size:  # Assuming `window_size` is defined
+        if len(self.history['total_profit']) > window_size: 
             window_returns = np.diff(self.history['total_profit'][-window_size:]) / self.history['total_profit'][-window_size-1:-1]
             sharpe_ratio = np.mean(window_returns) / np.std(window_returns) if np.std(window_returns) != 0 else 0
             step_reward += sharpe_ratio
