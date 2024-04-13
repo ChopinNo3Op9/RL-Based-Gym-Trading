@@ -3,7 +3,7 @@ from scipy.stats import mstats  # For geometric mean, used in Sharpe Ratio calcu
 
 from .trading_env import TradingEnv, Actions, Positions
 
-
+# TODO: How to find short andl long
 class StocksEnv(TradingEnv):
 
     def __init__(self, df, window_size, frame_bound, render_mode=None):
@@ -87,6 +87,7 @@ class StocksEnv(TradingEnv):
 
     #     return step_reward
     
+    # TODO: Fix negative rewards
     def _calculate_reward(self, action):
         trade = False
         if (action == Actions.Buy.value and self._position == Positions.Short) or \
@@ -146,6 +147,7 @@ class StocksEnv(TradingEnv):
     #             shares = self._total_profit / (last_trade_price + trade_cost)
     #             self._total_profit = shares * (current_price - trade_cost)
 
+    # TODO: Fix negative rewards
     def _update_profit(self, action):
         trade = False
         if (action == Actions.Buy.value and self._position == Positions.Short) or \
