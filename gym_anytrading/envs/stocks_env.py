@@ -28,6 +28,7 @@ class StocksEnv(TradingEnv):
     
     def _process_data(self):
         prices = self.df.loc[:, 'Close'].to_numpy()
+        print("princs: ", prices)
         
         # Validate index - Ensure we have enough data for the window size and indicators
         assert self.frame_bound[0] > self.window_size, "Frame bound start should be greater than window size."
@@ -63,8 +64,10 @@ class StocksEnv(TradingEnv):
         
         prices = df['Close'].to_numpy().astype(np.float32)
         signal_features = features.to_numpy().astype(np.float32)
+        print("signal_features: ", signal_features)
         
-        return prices, signal_features
+        # return prices, signal_features
+
 
 
     # def _calculate_reward(self, action):
