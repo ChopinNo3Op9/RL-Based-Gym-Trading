@@ -85,7 +85,6 @@ class TradingEnv(gym.Env):
 
     #     step_reward = self._calculate_reward(action)
     #     self._total_reward += step_reward
-
     #     self._update_profit(action)
 
     #     trade = False
