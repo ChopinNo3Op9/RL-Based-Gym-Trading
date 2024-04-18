@@ -3,7 +3,7 @@ from scipy.stats import mstats  # For geometric mean, used in Sharpe Ratio calcu
 
 from .trading_env import TradingEnv, Actions, Positions
 
-
+# TODO: How to find short andl long
 class StocksEnv(TradingEnv):
 
     def __init__(self, df, window_size, frame_bound, render_mode=None):
@@ -89,6 +89,7 @@ class StocksEnv(TradingEnv):
 
     #     return step_reward
     
+    # TODO: Fix negative rewards
     def _calculate_reward(self, action):
         trade = False
         if (action == Actions.Buy.value and self._position == Positions.Short) or \
@@ -173,6 +174,32 @@ class StocksEnv(TradingEnv):
     #             cost_of_buy_to_cover = self._total_profit * buy_cost / current_price  # Cost to cover the short
     #             self._total_profit = money_from_short - cost_of_buy_to_cover
 
+    # def _update_profit(self, action):
+    #     trade = False
+    #     if (action == Actions.Buy.value and self._position == Positions.Short) or \
+    #     (action == Actions.Sell.value and self._position == Positions.Long):
+    #         trade = True
+
+    #     if trade:
+    #         current_price = self.prices[self._current_tick]
+    #         last_trade_price = self.prices[self._last_trade_tick]
+
+    #         if self._position == Positions.Long:
+    #             # Exiting a Long position: Sell high
+    #             sell_cost = self.trade_fee_bid_percent * current_price  # Cost when selling
+    #             shares_bought = self._total_profit / last_trade_price
+    #             self._total_profit = (shares_bought * current_price) - (shares_bought * sell_cost)
+            
+    #         elif self._position == Positions.Short:
+    #             # Exiting a Short position: Buy low to cover
+    #             buy_cost = self.trade_fee_ask_percent * current_price  # Cost when buying to cover
+    #             # Here we assume the 'shares' are 'shorted' at 'last_trade_price' and now 'covered' at 'current_price'
+    #             # The profit from a short sale is: (Price at Short Sale - Price at Cover) * Number of Shares - Costs
+    #             money_from_short = self._total_profit * (last_trade_price / current_price)  # Adjust profit based on price change
+    #             cost_of_buy_to_cover = self._total_profit * buy_cost / current_price  # Cost to cover the short
+    #             self._total_profit = money_from_short - cost_of_buy_to_cover
+
+    # TODO: Fix negative rewards
     def _update_profit(self, action):
         trade = False
         if (action == Actions.Buy.value and self._position == Positions.Short) or \
