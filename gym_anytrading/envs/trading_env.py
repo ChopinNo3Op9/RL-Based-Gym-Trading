@@ -76,37 +76,37 @@ class TradingEnv(gym.Env):
 
         return observation, info
 
-    # def step(self, action):
-    #     self._truncated = False
-    #     self._current_tick += 1
+    def step(self, action):
+        self._truncated = False
+        self._current_tick += 1
 
-    #     if self._current_tick == self._end_tick:
-    #         self._truncated = True
+        if self._current_tick == self._end_tick:
+            self._truncated = True
 
-    #     step_reward = self._calculate_reward(action)
-    #     self._total_reward += step_reward
-    #     self._update_profit(action)
+        step_reward = self._calculate_reward(action)
+        self._total_reward += step_reward
+        self._update_profit(action)
 
-    #     trade = False
-    #     if (
-    #         (action == Actions.Buy.value and self._position == Positions.Short) or
-    #         (action == Actions.Sell.value and self._position == Positions.Long)
-    #     ):
-    #         trade = True
+        trade = False
+        if (
+            (action == Actions.Buy.value and self._position == Positions.Short) or
+            (action == Actions.Sell.value and self._position == Positions.Long)
+        ):
+            trade = True
 
-    #     if trade:
-    #         self._position = self._position.opposite()
-    #         self._last_trade_tick = self._current_tick
+        if trade:
+            self._position = self._position.opposite()
+            self._last_trade_tick = self._current_tick
 
-    #     self._position_history.append(self._position)
-    #     observation = self._get_observation()
-    #     info = self._get_info()
-    #     self._update_history(info)
+        self._position_history.append(self._position)
+        observation = self._get_observation()
+        info = self._get_info()
+        self._update_history(info)
 
-    #     if self.render_mode == 'human':
-    #         self._render_frame()
+        if self.render_mode == 'human':
+            self._render_frame()
 
-    #     return observation, step_reward, False, self._truncated, info
+        return observation, step_reward, False, self._truncated, info
 
     def step(self, action):
         self._truncated = self._current_tick + 1 >= self._end_tick
