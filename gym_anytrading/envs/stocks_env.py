@@ -69,70 +69,70 @@ class StocksEnv(TradingEnv):
         return prices, signal_features
 
 
-    # def _calculate_reward(self, action):
-    #     step_reward = 0
-
-    #     trade = False
-    #     if (
-    #         (action == Actions.Buy.value and self._position == Positions.Short) or
-    #         (action == Actions.Sell.value and self._position == Positions.Long)
-    #     ):
-    #         trade = True
-
-    #     if trade:
-    #         current_price = self.prices[self._current_tick]
-    #         last_trade_price = self.prices[self._last_trade_tick]
-    #         price_diff = current_price - last_trade_price
-
-    #         if self._position == Positions.Long:
-    #             step_reward += price_diff
-
-    #     return step_reward
-    
-    # TODO: Fix negative rewards
     def _calculate_reward(self, action):
+        step_reward = 0
+
         trade = False
-        if (action == Actions.Buy.value and self._position == Positions.Short) or \
-        (action == Actions.Sell.value and self._position == Positions.Long):
+        if (
+            (action == Actions.Buy.value and self._position == Positions.Short) or
+            (action == Actions.Sell.value and self._position == Positions.Long)
+        ):
             trade = True
 
-        current_price = self.prices[self._current_tick]
-        last_trade_price = self.prices[self._last_trade_tick]
-        price_diff = current_price - last_trade_price
+        if trade:
+            current_price = self.prices[self._current_tick]
+            last_trade_price = self.prices[self._last_trade_tick]
+            price_diff = current_price - last_trade_price
 
-        step_reward = 0
-        trade_cost = 0
-        if self._position == Positions.Long:
-            trade_cost = self.trade_fee_ask_percent * last_trade_price
-            step_reward += price_diff - trade_cost  # profit from price increase
-        elif self._position == Positions.Short:
-            trade_cost = self.trade_fee_bid_percent * last_trade_price
-            step_reward += -price_diff - trade_cost  # profit from price decrease
-
-        # Adjust for Sharpe Ratio over a rolling window of returns
-        window_size = 100
-        if len(self.history['total_profit']) > window_size: 
-            window_returns = np.diff(self.history['total_profit'][-window_size:]) / self.history['total_profit'][-window_size-1:-1]
-            sharpe_ratio = np.mean(window_returns) / np.std(window_returns) if np.std(window_returns) != 0 else 0
-            step_reward += sharpe_ratio
+            if self._position == Positions.Long:
+                step_reward += price_diff
 
         return step_reward
-
-    # def _update_profit(self, action):
+    
+    # TODO: Fix negative rewards
+    # def _calculate_reward(self, action):
     #     trade = False
-    #     if (
-    #         (action == Actions.Buy.value and self._position == Positions.Short) or
-    #         (action == Actions.Sell.value and self._position == Positions.Long)
-    #     ):
+    #     if (action == Actions.Buy.value and self._position == Positions.Short) or \
+    #     (action == Actions.Sell.value and self._position == Positions.Long):
     #         trade = True
 
-    #     if trade or self._truncated:
-    #         current_price = self.prices[self._current_tick]
-    #         last_trade_price = self.prices[self._last_trade_tick]
+    #     current_price = self.prices[self._current_tick]
+    #     last_trade_price = self.prices[self._last_trade_tick]
+    #     price_diff = current_price - last_trade_price
 
-    #         if self._position == Positions.Long:
-    #             shares = (self._total_profit * (1 - self.trade_fee_ask_percent)) / last_trade_price
-    #             self._total_profit = (shares * (1 - self.trade_fee_bid_percent)) * current_price
+    #     step_reward = 0
+    #     trade_cost = 0
+    #     if self._position == Positions.Long:
+    #         trade_cost = self.trade_fee_ask_percent * last_trade_price
+    #         step_reward += price_diff - trade_cost  # profit from price increase
+    #     elif self._position == Positions.Short:
+    #         trade_cost = self.trade_fee_bid_percent * last_trade_price
+    #         step_reward += -price_diff - trade_cost  # profit from price decrease
+
+    #     # Adjust for Sharpe Ratio over a rolling window of returns
+    #     window_size = 100
+    #     if len(self.history['total_profit']) > window_size: 
+    #         window_returns = np.diff(self.history['total_profit'][-window_size:]) / self.history['total_profit'][-window_size-1:-1]
+    #         sharpe_ratio = np.mean(window_returns) / np.std(window_returns) if np.std(window_returns) != 0 else 0
+    #         step_reward += sharpe_ratio
+
+    #     return step_reward
+
+    def _update_profit(self, action):
+        trade = False
+        if (
+            (action == Actions.Buy.value and self._position == Positions.Short) or
+            (action == Actions.Sell.value and self._position == Positions.Long)
+        ):
+            trade = True
+
+        if trade or self._truncated:
+            current_price = self.prices[self._current_tick]
+            last_trade_price = self.prices[self._last_trade_tick]
+
+            if self._position == Positions.Long:
+                shares = (self._total_profit * (1 - self.trade_fee_ask_percent)) / last_trade_price
+                self._total_profit = (shares * (1 - self.trade_fee_bid_percent)) * current_price
 
     # def _update_profit(self, action):
     #     trade = False
@@ -199,28 +199,29 @@ class StocksEnv(TradingEnv):
     #             cost_of_buy_to_cover = self._total_profit * buy_cost / current_price  # Cost to cover the short
     #             self._total_profit = money_from_short - cost_of_buy_to_cover
 
-    def _update_profit(self, action):
-        trade = False
-        if (action == Actions.Buy.value and self._position == Positions.Short) or \
-        (action == Actions.Sell.value and self._position == Positions.Long):
-            trade = True
+    # TODO: Fix negative rewards
+    # def _update_profit(self, action):
+    #     trade = False
+    #     if (action == Actions.Buy.value and self._position == Positions.Short) or \
+    #     (action == Actions.Sell.value and self._position == Positions.Long):
+    #         trade = True
+    
+    #     if trade:
+    #         current_price = self.prices[self._current_tick]
+    #         last_trade_price = self.prices[self._last_trade_tick]
 
-        if trade:
-            current_price = self.prices[self._current_tick]
-            last_trade_price = self.prices[self._last_trade_tick]
+    #         if self._position == Positions.Long:
+    #             # Exiting a Long position: Sell high
+    #             sell_cost = self.trade_fee_bid_percent * current_price  # Cost when selling
+    #             shares_bought = self._total_profit / last_trade_price
+    #             self._total_profit = (shares_bought * current_price) - (shares_bought * sell_cost)
 
-            if self._position == Positions.Long:
-                # Exiting a Long position: Sell high
-                sell_cost = self.trade_fee_bid_percent * current_price  # Cost when selling
-                shares_bought = self._total_profit / last_trade_price
-                self._total_profit = (shares_bought * current_price) - (shares_bought * sell_cost)
-
-            elif self._position == Positions.Short:
-                # Exiting a Short position: Buy low to cover
-                buy_cost = self.trade_fee_ask_percent * current_price  # Cost when buying to cover
-                shares_shorted = self._total_profit / last_trade_price
-                # The correct profit calculation when closing a short position
-                self._total_profit = (shares_shorted * (last_trade_price - current_price)) - (shares_shorted * buy_cost)
+    #         elif self._position == Positions.Short:
+    #             # Exiting a Short position: Buy low to cover
+    #             buy_cost = self.trade_fee_ask_percent * current_price  # Cost when buying to cover
+    #             shares_shorted = self._total_profit / last_trade_price
+    #             # The correct profit calculation when closing a short position
+    #             self._total_profit = (shares_shorted * (last_trade_price - current_price)) - (shares_shorted * buy_cost)
 
     def max_possible_profit(self):
         current_tick = self._start_tick
