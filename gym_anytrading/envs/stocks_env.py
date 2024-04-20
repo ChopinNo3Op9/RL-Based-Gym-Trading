@@ -66,7 +66,7 @@ class StocksEnv(TradingEnv):
         signal_features = features.to_numpy().astype(np.float32)
         print("signal_features: ", signal_features)
         
-        # return prices, signal_features
+        return prices, signal_features
 
 
     # def _calculate_reward(self, action):
@@ -199,7 +199,6 @@ class StocksEnv(TradingEnv):
     #             cost_of_buy_to_cover = self._total_profit * buy_cost / current_price  # Cost to cover the short
     #             self._total_profit = money_from_short - cost_of_buy_to_cover
 
-    # TODO: Fix negative rewards
     def _update_profit(self, action):
         trade = False
         if (action == Actions.Buy.value and self._position == Positions.Short) or \
