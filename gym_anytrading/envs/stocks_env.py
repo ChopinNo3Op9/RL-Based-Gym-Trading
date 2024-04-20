@@ -66,7 +66,7 @@ class StocksEnv(TradingEnv):
         signal_features = features.to_numpy().astype(np.float32)
         print("signal_features: ", signal_features)
         
-        # return prices, signal_features
+        return prices, signal_features
 
 
     def _calculate_reward(self, action):
@@ -205,7 +205,7 @@ class StocksEnv(TradingEnv):
     #     if (action == Actions.Buy.value and self._position == Positions.Short) or \
     #     (action == Actions.Sell.value and self._position == Positions.Long):
     #         trade = True
-
+    
     #     if trade:
     #         current_price = self.prices[self._current_tick]
     #         last_trade_price = self.prices[self._last_trade_tick]
